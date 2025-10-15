@@ -1,38 +1,48 @@
+#include <ctype.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include "token.h"
+#include "error.h"
 
 int main(int argc, char **argv)
 {
+    // 現在着目しているトークン
+    Token *token;
+
     if (argc != 2)
     {
-        fprintf(stderr, "引数の個数が正しくありません\n");
+        error("引数の個数が正しくありません");
         return 1;
     }
 
-    char *p = argv[1];
+    // トークナイズする
+    token = tokenize(argv[1]);
 
+    // アセンブリの前半部分を出力
     printf(".intel_syntax noprefix\n");
-    printf(".global main\n");
+    printf(".globl main\n");
     printf("main:\n");
-    printf("  mov rax, %ld\n", strtol(p, &p, 10));
 
-    while (*p)
+    // 式の最初は数でなければならないので、それをチェックして
+    // 最初のmov命令を出力
+    printf("  mov rax, %d\n", expect_number(&token));
+
+    // `+ <数>`あるいは`- <数>`というトークンの並びを消費しつつ
+    // アセンブリを出力
+    while (!at_eof(token))
     {
-        if (*p == '+')
+        if (consume('+', &token))
         {
-            p++;
-            printf("  add rax, %ld\n", strtol(p, &p, 10));
+            printf("  add rax, %d\n", expect_number(&token));
             continue;
         }
-        if (*p == '-')
-        {
-            p++;
-            printf("  sub rax, %ld\n", strtol(p, &p, 10));
-            continue;
-        }
-        fprintf(stderr, "予期しない文字です: '%c'\n", *p);
 
-        return 1;
+        expect('-', &token);
+
+        printf("  sub rax, %d\n", expect_number(&token));
     }
 
     printf("  ret\n");
