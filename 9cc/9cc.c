@@ -11,7 +11,8 @@ int main(int argc, char **argv)
 {
     // 現在着目しているトークン
     Token *token;
-    TokenizedStr *tokenized_str;
+    // tokenizeされたユーザー入力
+    TokenizedStr *user_input;
 
     if (argc != 2)
     {
@@ -20,8 +21,8 @@ int main(int argc, char **argv)
     }
 
     // トークナイズする
-    tokenized_str = tokenize(argv[1]);
-    token = tokenized_str->head;
+    user_input = tokenize(argv[1]);
+    token = user_input->head;
 
     // アセンブリの前半部分を出力
     printf(".intel_syntax noprefix\n");
