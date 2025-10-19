@@ -2,24 +2,28 @@
 #include <stdio.h>
 #include <ctype.h>
 #include "token.h"
+#include "tokenized_str.h"
 #include "error.h"
 
 // 新しいトークンを作成してcurに繋げる
-Token *new_token(TokenKind kind, Token *cur, char *str)
+Token *new_token(TokenKind kind, Token *cur, char *str, TokenizedStr *ts)
 {
     Token *tok = calloc(1, sizeof(Token));
     tok->kind = kind;
     tok->str = str;
+    tok->owner = ts;
     cur->next = tok;
     return tok;
 }
 
 // 入力文字列pをトークナイズしてそれを返す
-Token *tokenize(char *p)
+TokenizedStr *tokenize(char *p)
 {
     Token head;
     head.next = NULL;
     Token *cur = &head;
+    TokenizedStr *ts = calloc(1, sizeof(TokenizedStr));
+    ts->value = p;
 
     while (*p)
     {
@@ -32,22 +36,23 @@ Token *tokenize(char *p)
 
         if (*p == '+' || *p == '-')
         {
-            cur = new_token(TK_RESERVED, cur, p++);
+            cur = new_token(TK_RESERVED, cur, p++, ts);
             continue;
         }
 
         if (isdigit(*p))
         {
-            cur = new_token(TK_NUM, cur, p);
+            cur = new_token(TK_NUM, cur, p, ts);
             cur->val = strtol(p, &p, 10);
             continue;
         }
 
-        error("トークナイズできません");
+        error_at(p, p, "トークナイズできません");
     }
 
-    new_token(TK_EOF, cur, p);
-    return head.next;
+    new_token(TK_EOF, cur, p, ts);
+    ts->head = head.next;
+    return ts;
 }
 
 // 次のトークンが期待している記号のときには、トークンを1つ読み進めて
@@ -69,7 +74,8 @@ void expect(char op, Token **token)
 {
     if ((*token)->kind != TK_RESERVED || (*token)->str[0] != op)
     {
-        error("'%c'ではありません", op);
+        error("tst");
+        error_at((*token)->str, (*token)->owner->value, "数ではありません");
     }
 
     *token = (*token)->next;
@@ -81,7 +87,7 @@ int expect_number(Token **token)
 {
     if ((*token)->kind != TK_NUM)
     {
-        error("数ではありません");
+        error_at((*token)->str, (*token)->owner->value, "数ではありません");
     }
 
     int val = (*token)->val;

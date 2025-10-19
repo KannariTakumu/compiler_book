@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include "tokenized_str.h"
 
 // トークンの種類
 typedef enum
@@ -11,6 +12,7 @@ typedef enum
 } TokenKind;
 
 typedef struct Token Token;
+typedef struct TokenizedStr TokenizedStr;
 
 // トークン型
 struct Token
@@ -19,10 +21,11 @@ struct Token
     Token *next;    // 次の入力トークン
     int val;        // kindがTK_NUMの場合、その数値
     char *str;      // トークン文字列
+    TokenizedStr *owner; //トークンが属している文字列
 };
 
-Token *new_token(TokenKind kind, Token *cur, char *str);
-Token *tokenize(char *p);
+Token *new_token(TokenKind kind, Token *cur, char *str, TokenizedStr *ts);
+TokenizedStr *tokenize(char *p);
 bool consume(char op, Token **token);
 void expect(char op, Token **token);
 int expect_number(Token **token);
