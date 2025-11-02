@@ -1,17 +1,24 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
 #include "token.h"
 #include "tokenized_str.h"
 #include "error.h"
 
+// 前方宣言
+bool is_reserved_char(char c);
+bool is_reserved_str(char *str);
+bool is_expected_reserved_token(char *op, Token *token);
+
 // 新しいトークンを作成してcurに繋げる
-Token *new_token(TokenKind kind, Token *cur, char *str, TokenizedStr *ts)
+Token *new_token(TokenKind kind, Token *cur, char *str, TokenizedStr *ts, int len)
 {
     Token *tok = calloc(1, sizeof(Token));
     tok->kind = kind;
     tok->str = str;
     tok->owner = ts;
+    tok->len = len;
     cur->next = tok;
     return tok;
 }
@@ -34,15 +41,22 @@ TokenizedStr *tokenize(char *p)
             continue;
         }
 
-        if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')')
+        if (is_reserved_str(p)) {
+            cur = new_token(TK_RESERVED, cur, p, ts, 2);
+            p += 2;
+            continue;
+        }
+
+        if (is_reserved_char(*p))
         {
-            cur = new_token(TK_RESERVED, cur, p++, ts);
+            cur = new_token(TK_RESERVED, cur, p, ts, 1);
+            p += 1;
             continue;
         }
 
         if (isdigit(*p))
         {
-            cur = new_token(TK_NUM, cur, p, ts);
+            cur = new_token(TK_NUM, cur, p, ts, 0);
             cur->val = strtol(p, &p, 10);
             continue;
         }
@@ -50,16 +64,26 @@ TokenizedStr *tokenize(char *p)
         error_at(p, p, "トークナイズできません");
     }
 
-    new_token(TK_EOF, cur, p, ts);
+    new_token(TK_EOF, cur, p, ts, 0);
     ts->head = head.next;
     return ts;
 }
 
+bool is_reserved_char(char c)
+{
+    return c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')' || c == '<' || c == '>';
+}
+
+bool is_reserved_str(char *str)
+{
+    return memcmp(str, "==", 2) == 0 || memcmp(str, "!=", 2) == 0 || memcmp(str, "<=", 2) == 0 || memcmp(str, ">=", 2) == 0;
+}
+
 // 次のトークンが期待している記号のときには、トークンを1つ読み進めて
 // 真を返す。それ以外の場合には偽を返す。
-bool consume(char op, Token **token)
+bool consume(char *op, Token **token)
 {
-    if ((*token)->kind != TK_RESERVED || (*token)->str[0] != op)
+    if (!is_expected_reserved_token(op, *token))
     {
         return false;
     }
@@ -70,12 +94,11 @@ bool consume(char op, Token **token)
 
 // 次のトークンが期待している記号のときには、トークンを1つ読み進める。
 // それ以外の場合にはエラーを報告する。
-void expect(char op, Token **token)
+void expect(char *op, Token **token)
 {
-    if ((*token)->kind != TK_RESERVED || (*token)->str[0] != op)
+    if (!is_expected_reserved_token(op, *token))
     {
-        error("tst");
-        error_at((*token)->str, (*token)->owner->value, "数ではありません");
+        error_at((*token)->str, (*token)->owner->value, "'%s'ではありません", op);
     }
 
     *token = (*token)->next;
@@ -93,6 +116,29 @@ int expect_number(Token **token)
     int val = (*token)->val;
     *token = (*token)->next;
     return val;
+}
+
+bool is_expected_reserved_token(char *op, Token *token)
+{
+    // トークンの型が記号でない場合
+    if (token->kind != TK_RESERVED)
+    {
+        return false;
+    }
+
+    // 演算子の長さが異なる場合
+    if (strlen(op) != token->len)
+    {
+        return false;
+    }
+
+    // 文字列の内容が異なる場合
+    if (memcmp(token->str, op, token->len) != 0)
+    {
+        return false;
+    }
+
+    return true;
 }
 
 bool at_eof(Token *token)

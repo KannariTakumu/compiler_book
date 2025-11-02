@@ -18,13 +18,47 @@ Node *new_node_num(int val) {
   return node;
 }
 
+Node *equality(Token **token) {
+  Node *node = relational(token);
+
+  for (;;) {
+    if (consume("==", token))
+      node = new_node(ND_EQ, node, relational(token));
+    else if (consume("!=", token))
+      node = new_node(ND_NE, node, relational(token));
+    else
+      return node;
+  }
+}
+
 Node *expr(Token **token) {
+  return equality(token);
+}
+
+Node *relational(Token **token) {
+  Node *node = add(token);
+
+  for (;;) {
+    if (consume("<", token))
+      node = new_node(ND_LT, node, add(token));
+    else if (consume("<=", token))
+      node = new_node(ND_LE, node, add(token));
+    else if (consume(">", token))
+      node = new_node(ND_LT, add(token), node);
+    else if (consume(">=", token))
+      node = new_node(ND_LE, add(token), node);
+    else
+      return node;
+  }
+}
+
+Node *add(Token **token) {
   Node *node = mul(token);
 
   for (;;) {
-    if (consume('+', token))
+    if (consume("+", token))
       node = new_node(ND_ADD, node, mul(token));
-    else if (consume('-', token))
+    else if (consume("-", token))
       node = new_node(ND_SUB, node, mul(token));
     else
       return node;
@@ -35,9 +69,9 @@ Node *mul(Token **token) {
   Node *node = primary(token);
 
   for (;;) {
-    if (consume('*', token))
+    if (consume("*", token))
       node = new_node(ND_MUL, node, primary(token));
-    else if (consume('/', token))
+    else if (consume("/", token))
       node = new_node(ND_DIV, node, primary(token));
     else
       return node;
@@ -46,9 +80,9 @@ Node *mul(Token **token) {
 
 Node *primary(Token **token) {
   // 次のトークンが"("なら、"(" expr ")"のはず
-  if (consume('(', token)) {
+  if (consume("(", token)) {
     Node *node = expr(token);
-    expect(')', token);
+    expect(")", token);
     return node;
   }
 

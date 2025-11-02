@@ -22,11 +22,12 @@ struct Token
     int val;        // kindがTK_NUMの場合、その数値
     char *str;      // トークン文字列
     TokenizedStr *owner; //トークンが属している文字列
+    int len;
 };
 
-Token *new_token(TokenKind kind, Token *cur, char *str, TokenizedStr *ts);
+Token *new_token(TokenKind kind, Token *cur, char *str, TokenizedStr *ts, int len);
 TokenizedStr *tokenize(char *p);
-bool consume(char op, Token **token);
-void expect(char op, Token **token);
+bool consume(char *op, Token **token);
+void expect(char *op, Token **token);
 int expect_number(Token **token);
 bool at_eof(Token *token);
