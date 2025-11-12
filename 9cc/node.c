@@ -18,6 +18,37 @@ Node *new_node_num(int val) {
   return node;
 }
 
+Node *new_node_lvar(Token *token) {
+  Node *node = calloc(1, sizeof(Node));
+  node->kind = ND_LVAR;
+  node->offset = (token->str[0] - 'a' + 1) * 8; // a
+  return node;
+}
+
+void program(Node **code, Token **token) {
+  int i = 0;
+  while (!at_eof(*token))
+    code[i++] = stmt(token);
+  code[i] = NULL;
+}
+
+Node *expr(Token **token) {
+  return assign(token);
+}
+
+Node *assign(Token **token) {
+  Node *node = equality(token);
+  if (consume("=", token))
+    node = new_node(ND_ASSIGN, node, assign(token));
+  return node;
+}
+
+Node *stmt(Token **token) {
+  Node *node = expr(token);
+  expect(";", token);
+  return node;
+}
+
 Node *equality(Token **token) {
   Node *node = relational(token);
 
@@ -31,9 +62,7 @@ Node *equality(Token **token) {
   }
 }
 
-Node *expr(Token **token) {
-  return equality(token);
-}
+
 
 Node *relational(Token **token) {
   Node *node = add(token);
@@ -84,6 +113,12 @@ Node *primary(Token **token) {
     Node *node = expr(token);
     expect(")", token);
     return node;
+  }
+
+  // 次のトークンが識別子なら、変数のはず
+  Token *tok = consume_ident(token);
+  if (tok) {
+    return new_node_lvar(tok);
   }
 
   // そうでなければ数値のはず

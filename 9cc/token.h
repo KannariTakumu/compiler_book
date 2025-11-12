@@ -7,6 +7,7 @@
 typedef enum
 {
     TK_RESERVED, // 記号
+    TK_IDENT,    // 識別子
     TK_NUM,      // 整数トークン
     TK_EOF,      // 入力の終わりを表すトークン
 } TokenKind;
@@ -28,6 +29,7 @@ struct Token
 Token *new_token(TokenKind kind, Token *cur, char *str, TokenizedStr *ts, int len);
 TokenizedStr *tokenize(char *p);
 bool consume(char *op, Token **token);
+Token *consume_ident(Token **token);
 void expect(char *op, Token **token);
 int expect_number(Token **token);
 bool at_eof(Token *token);

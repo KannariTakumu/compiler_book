@@ -9,6 +9,7 @@
 // 前方宣言
 bool is_reserved_char(char c);
 bool is_reserved_str(char *str);
+bool is_ident_char(char c);
 bool is_expected_reserved_token(char *op, Token *token);
 
 // 新しいトークンを作成してcurに繋げる
@@ -54,6 +55,12 @@ TokenizedStr *tokenize(char *p)
             continue;
         }
 
+        if (is_ident_char(*p)){
+            cur = new_token(TK_IDENT, cur, p, ts, 1);
+            p += 1;
+            continue;
+        }
+
         if (isdigit(*p))
         {
             cur = new_token(TK_NUM, cur, p, ts, 0);
@@ -71,12 +78,17 @@ TokenizedStr *tokenize(char *p)
 
 bool is_reserved_char(char c)
 {
-    return c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')' || c == '<' || c == '>';
+    return c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')' || c == '<' || c == '>' || c == ';' || c == '=';
 }
 
 bool is_reserved_str(char *str)
 {
     return memcmp(str, "==", 2) == 0 || memcmp(str, "!=", 2) == 0 || memcmp(str, "<=", 2) == 0 || memcmp(str, ">=", 2) == 0;
+}
+
+bool is_ident_char(char c)
+{
+    return 'a' <= c && c <= 'z';
 }
 
 // 次のトークンが期待している記号のときには、トークンを1つ読み進めて
@@ -90,6 +102,20 @@ bool consume(char *op, Token **token)
 
     *token = (*token)->next;
     return true;
+}
+
+// 次のトークンが識別子のときには、トークンを1つ読み進めて
+// そのトークンを返す。それ以外の場合にはNULLを返す。
+Token *consume_ident(Token **token)
+{
+    if ((*token)->kind != TK_IDENT)
+    {
+        return NULL;
+    }
+
+    Token *tok = *token;
+    *token = (*token)->next;
+    return tok;
 }
 
 // 次のトークンが期待している記号のときには、トークンを1つ読み進める。

@@ -12,6 +12,8 @@ typedef enum {
   ND_NE,  // !=
   ND_LT,  // <
   ND_LE,  // <=
+  ND_ASSIGN, // =
+  ND_LVAR, // ローカル変数
   ND_NUM, // 整数
 } NodeKind;
 
@@ -23,11 +25,19 @@ struct Node {
   Node *lhs;     // 左辺
   Node *rhs;     // 右辺
   int val;       // kindがND_NUMの場合のみ使う
+  int offset;    // kindがND_LVARの場合のみ使う。RBPからのオフセット
 };
 
+// ノード生成関数
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs);
 Node *new_node_num(int val);
+Node *new_node_lvar(Token *token);
+
+// 構文解析関数（演算子の優先順位順）
+void program(Node **code, Token **token);
+Node *stmt(Token **token);
 Node *expr(Token **token);
+Node *assign(Token **token);
 Node *equality(Token **token);
 Node *relational(Token **token);
 Node *add(Token **token);
