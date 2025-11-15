@@ -1,4 +1,17 @@
 #!/bin/bash
+
+# テストケースディレクトリ
+TEST_DIR="tests"
+
+# 実行するテストファイル一覧
+TEST_FILES=(
+  "basic_arithmetic.txt"
+  "comparison.txt"
+  "variables.txt"
+  "return.txt"
+  "integration.txt"
+)
+
 assert() {
   expected="$1"
   input="$2"
@@ -16,43 +29,43 @@ assert() {
   fi
 }
 
-assert 0 '0;'
-assert 42 '42;'
-assert 21 "5+20-4;"
-assert 9 "2 + 8 - 1;"
-assert 47 '5+6*7;'
-assert 15 '5*(9-6);'
-assert 4 '(3+5)/2;'
+# 単一のテストファイルを実行する関数
+run_test_file() {
+  local test_file="$1"
+  local full_path="$TEST_DIR/$test_file"
+  
+  if [ ! -f "$full_path" ]; then
+    echo "Warning: Test file $full_path not found, skipping..."
+    return
+  fi
+  
+  echo "Running tests from $test_file..."
+  
+  while read -r line || [ -n "$line" ]; do
+    # コメント行と空行をスキップ
+    if [[ "$line" =~ ^#.*$ ]] || [[ -z "$line" ]]; then
+      continue
+    fi
+    
+    # 最初のスペースで分割
+    expected=$(echo "$line" | cut -d' ' -f1)
+    input=$(echo "$line" | cut -d' ' -f2-)
+    
+    # テストを実行
+    assert "$expected" "$input"
+  done < "$full_path"
+}
 
-assert 0 '0==1;'
-assert 1 '42==42;'
-assert 1 '0!=1;'
-assert 0 '42!=42;'
+# 引数がある場合は特定のテストファイルのみ実行
+if [ $# -eq 1 ]; then
+  # 単一テストファイル実行
+  test_file="$1"
+  run_test_file "$test_file"
+else
+  # 全テストファイルを実行
+  for test_file in "${TEST_FILES[@]}"; do
+    run_test_file "$test_file"
+  done
+fi
 
-assert 1 '0<1;'
-assert 0 '1<1;'
-assert 0 '2<1;'
-assert 1 '0<=1;'
-assert 1 '1<=1;'
-assert 0 '2<=1;'
-
-assert 1 '1>0;'
-assert 0 '1>1;'
-assert 0 '1>2;'
-assert 1 '1>=0;'
-assert 1 '1>=1;'
-assert 0 '1>=2;'
-
-assert 14 'a = 3; b = 5 * 6 - 8; a + b / 2;'
-assert 14 'a = 3; b = 5 * 6 - 8; c = a + b / 2; c;'
-assert 40 'a=3;b=5;c=7;d=9;e=11;a+b*c-d+e;'
-assert 3 'a=3; a;'
-assert 5 'a=3; b=5; a=b; a;'
-
-assert 14 'aa = 3; b = 5 * 6 - 8; aa + b / 2;'
-assert 14 'abc = 3; b = 5 * 6 - 8; abc + b / 2;'
-assert 6 'foo = 1; bar = 2 + 3; foo + bar;'
-
-assert 3 'return 3;'
-assert 5 'a=3; return a+2;'
 echo OK

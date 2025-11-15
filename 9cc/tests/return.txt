@@ -1,0 +1,5 @@
+# return文のテストケース
+
+# 基本的なreturn文
+3 return 3;
+5 a=3; return a+2;
