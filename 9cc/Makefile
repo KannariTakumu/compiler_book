@@ -1,8 +1,8 @@
 CFLAGS = -std=c11 -g -static
 CC     = gcc
 
-# オブジェクトファイル一覧
-OBJS = 9cc.o token.o error.o tokenized_str.o node.o generator.o lvar.o
+SRCS=$(wildcard *.c)
+OBJS=$(SRCS:.c=.o)
 
 # 最終成果物
 9cc: $(OBJS)
