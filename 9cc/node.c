@@ -2,8 +2,10 @@
 
 #include "node.h"
 #include "token.h"
+#include "lvar.h"
 
-Node *new_node(NodeKind kind, Node *lhs, Node *rhs) {
+Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
+{
   Node *node = calloc(1, sizeof(Node));
   node->kind = kind;
   node->lhs = lhs;
@@ -11,48 +13,64 @@ Node *new_node(NodeKind kind, Node *lhs, Node *rhs) {
   return node;
 }
 
-Node *new_node_num(int val) {
+Node *new_node_num(int val)
+{
   Node *node = calloc(1, sizeof(Node));
   node->kind = ND_NUM;
   node->val = val;
   return node;
 }
 
-Node *new_node_lvar(Token *token) {
+Node *new_node_lvar(Token *token)
+{
   Node *node = calloc(1, sizeof(Node));
   node->kind = ND_LVAR;
-  node->offset = (token->str[0] - 'a' + 1) * 8; // a
+  LVar *lvar = find_lvar(token);
+  if (lvar)
+  {
+    node->offset = lvar->offset;
+  }
+  else
+  {
+    node->offset = new_lvar(token)->offset;
+  }
   return node;
 }
 
-void program(Node **code, Token **token) {
+void program(Node **code, Token **token)
+{
   int i = 0;
   while (!at_eof(*token))
     code[i++] = stmt(token);
   code[i] = NULL;
 }
 
-Node *expr(Token **token) {
+Node *expr(Token **token)
+{
   return assign(token);
 }
 
-Node *assign(Token **token) {
+Node *assign(Token **token)
+{
   Node *node = equality(token);
   if (consume("=", token))
     node = new_node(ND_ASSIGN, node, assign(token));
   return node;
 }
 
-Node *stmt(Token **token) {
+Node *stmt(Token **token)
+{
   Node *node = expr(token);
   expect(";", token);
   return node;
 }
 
-Node *equality(Token **token) {
+Node *equality(Token **token)
+{
   Node *node = relational(token);
 
-  for (;;) {
+  for (;;)
+  {
     if (consume("==", token))
       node = new_node(ND_EQ, node, relational(token));
     else if (consume("!=", token))
@@ -62,12 +80,12 @@ Node *equality(Token **token) {
   }
 }
 
-
-
-Node *relational(Token **token) {
+Node *relational(Token **token)
+{
   Node *node = add(token);
 
-  for (;;) {
+  for (;;)
+  {
     if (consume("<", token))
       node = new_node(ND_LT, node, add(token));
     else if (consume("<=", token))
@@ -81,10 +99,12 @@ Node *relational(Token **token) {
   }
 }
 
-Node *add(Token **token) {
+Node *add(Token **token)
+{
   Node *node = mul(token);
 
-  for (;;) {
+  for (;;)
+  {
     if (consume("+", token))
       node = new_node(ND_ADD, node, mul(token));
     else if (consume("-", token))
@@ -94,10 +114,12 @@ Node *add(Token **token) {
   }
 }
 
-Node *mul(Token **token) {
+Node *mul(Token **token)
+{
   Node *node = primary(token);
 
-  for (;;) {
+  for (;;)
+  {
     if (consume("*", token))
       node = new_node(ND_MUL, node, primary(token));
     else if (consume("/", token))
@@ -107,9 +129,11 @@ Node *mul(Token **token) {
   }
 }
 
-Node *primary(Token **token) {
+Node *primary(Token **token)
+{
   // 次のトークンが"("なら、"(" expr ")"のはず
-  if (consume("(", token)) {
+  if (consume("(", token))
+  {
     Node *node = expr(token);
     expect(")", token);
     return node;
@@ -117,7 +141,8 @@ Node *primary(Token **token) {
 
   // 次のトークンが識別子なら、変数のはず
   Token *tok = consume_ident(token);
-  if (tok) {
+  if (tok)
+  {
     return new_node_lvar(tok);
   }
 

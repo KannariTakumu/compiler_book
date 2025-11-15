@@ -42,7 +42,8 @@ TokenizedStr *tokenize(char *p)
             continue;
         }
 
-        if (is_reserved_str(p)) {
+        if (is_reserved_str(p))
+        {
             cur = new_token(TK_RESERVED, cur, p, ts, 2);
             p += 2;
             continue;
@@ -55,9 +56,14 @@ TokenizedStr *tokenize(char *p)
             continue;
         }
 
-        if (is_ident_char(*p)){
-            cur = new_token(TK_IDENT, cur, p, ts, 1);
-            p += 1;
+        if (is_ident_char(*p))
+        {
+            char *start = p;
+            while (is_ident_char(*p) || isdigit(*p))
+            {
+                p++;
+            }
+            cur = new_token(TK_IDENT, cur, start, ts, p - start);
             continue;
         }
 
