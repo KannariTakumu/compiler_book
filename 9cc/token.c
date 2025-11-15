@@ -135,7 +135,7 @@ Token *consume_return(Token **token)
 {
     if ((*token)->kind != TK_RETURN)
     {
-        return NULL;
+        return false;
     }
 
     Token *tok = *token;
@@ -149,7 +149,7 @@ Token *consume_ident(Token **token)
 {
     if ((*token)->kind != TK_IDENT)
     {
-        return NULL;
+        return false;
     }
 
     Token *tok = *token;
