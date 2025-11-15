@@ -3,7 +3,8 @@
 #include "node.h"
 #include "error.h"
 
-void gen_lval(Node *node) {
+void gen_lval(Node *node)
+{
   if (node->kind != ND_LVAR)
     error("代入の左辺値が変数ではありません");
 
@@ -12,8 +13,20 @@ void gen_lval(Node *node) {
   printf("  push rax\n");
 }
 
-void gen(Node *node) {
-  switch (node->kind) {
+void gen(Node *node)
+{
+  if (node->kind == ND_RETURN)
+  {
+    gen(node->lhs);
+    printf("  pop rax\n");
+    printf("  mov rsp, rbp\n");
+    printf("  pop rbp\n");
+    printf("  ret\n");
+    return;
+  }
+
+  switch (node->kind)
+  {
   case ND_NUM:
     printf("  push %d\n", node->val);
     return;
@@ -40,7 +53,8 @@ void gen(Node *node) {
   printf("  pop rdi\n");
   printf("  pop rax\n");
 
-  switch (node->kind) {
+  switch (node->kind)
+  {
   case ND_ADD:
     printf("  add rax, rdi\n");
     break;

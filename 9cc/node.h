@@ -3,24 +3,27 @@
 #include "token.h"
 
 // 抽象構文木のノードの種類
-typedef enum {
-  ND_ADD, // +
-  ND_SUB, // -
-  ND_MUL, // *
-  ND_DIV, // /
-  ND_EQ,  // ==
-  ND_NE,  // !=
-  ND_LT,  // <
-  ND_LE,  // <=
+typedef enum
+{
+  ND_ADD,    // +
+  ND_SUB,    // -
+  ND_MUL,    // *
+  ND_DIV,    // /
+  ND_EQ,     // ==
+  ND_NE,     // !=
+  ND_LT,     // <
+  ND_LE,     // <=
   ND_ASSIGN, // =
-  ND_LVAR, // ローカル変数
-  ND_NUM, // 整数
+  ND_LVAR,   // ローカル変数
+  ND_NUM,    // 整数
+  ND_RETURN, // return文
 } NodeKind;
 
 typedef struct Node Node;
 
 // 抽象構文木のノードの型
-struct Node {
+struct Node
+{
   NodeKind kind; // ノードの型
   Node *lhs;     // 左辺
   Node *rhs;     // 右辺
@@ -32,6 +35,7 @@ struct Node {
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs);
 Node *new_node_num(int val);
 Node *new_node_lvar(Token *token);
+Node *new_node_return(Token **token);
 
 // 構文解析関数（演算子の優先順位順）
 void program(Node **code, Token **token);

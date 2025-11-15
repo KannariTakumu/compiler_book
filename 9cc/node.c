@@ -3,6 +3,7 @@
 #include "node.h"
 #include "token.h"
 #include "lvar.h"
+#include "error.h"
 
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
 {
@@ -37,6 +38,14 @@ Node *new_node_lvar(Token *token)
   return node;
 }
 
+Node *new_node_return(Token **token)
+{
+  Node *node = calloc(1, sizeof(Node));
+  node->kind = ND_RETURN;
+  node->lhs = expr(token);
+  return node;
+}
+
 void program(Node **code, Token **token)
 {
   int i = 0;
@@ -60,8 +69,21 @@ Node *assign(Token **token)
 
 Node *stmt(Token **token)
 {
-  Node *node = expr(token);
-  expect(";", token);
+
+  Node *node;
+  if (consume_return(token))
+  {
+    node = new_node_return(token);
+  }
+  else
+  {
+    node = expr(token);
+  }
+
+  if (!consume(";", token))
+  {
+    error_at((*token)->str, (*token)->owner->value, "';'ではありません");
+  }
   return node;
 }
 
