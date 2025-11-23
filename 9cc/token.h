@@ -13,6 +13,7 @@ typedef enum
     TK_IF,       // ifキーワード
     TK_ELSE,     // elseキーワード
     TK_WHILE,    // whileキーワード
+    TK_FOR,      // forキーワード
     TK_EOF,      // 入力の終わりを表すトークン
 } TokenKind;
 

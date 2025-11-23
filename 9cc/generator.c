@@ -69,6 +69,42 @@ void gen(Node *node)
     return;
   }
 
+  if (node->kind == ND_FOR)
+  {
+    int current_label = labelseq++;
+
+    // 初期化文
+    if (node->for_init)
+    {
+      gen(node->for_init);
+      printf("  pop rax\n"); // 初期化文の結果を破棄
+    }
+
+    printf(".Lbegin%d:\n", current_label);
+
+    // 条件式
+    if (node->for_cond)
+    {
+      gen(node->for_cond);
+      printf("  pop rax\n");
+      printf("  cmp rax, 0\n");
+      printf("  je .Lend%d\n", current_label);
+    }
+
+    // for文本体
+    gen(node->for_body);
+
+    if (node->for_update)
+    {
+      gen(node->for_update);
+      printf("  pop rax\n"); // 更新文の結果を破棄
+    }
+
+    printf("  jmp .Lbegin%d\n", current_label);
+    printf(".Lend%d:\n", current_label);
+    return;
+  }
+
   switch (node->kind)
   {
   case ND_NUM:

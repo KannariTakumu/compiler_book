@@ -35,6 +35,9 @@ test-if: 9cc
 test-while: 9cc
 	./test.sh while.txt
 
+test-for: 9cc
+	./test.sh for.txt
+
 test-integration: 9cc
 	./test.sh integration.txt
 
@@ -42,4 +45,4 @@ test-integration: 9cc
 clean:
 	rm -f 9cc *.o *~ tmp*
 
-.PHONY: test test-arithmetic test-comparison test-variables test-return test-if test-integration help clean
+.PHONY: test test-arithmetic test-comparison test-variables test-return test-if test-while test-for test-integration help clean

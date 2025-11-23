@@ -15,6 +15,7 @@ bool is_expected_reserved_token(char *op, Token *token);
 bool is_if_keyword(char *str);
 bool is_else_keyword(char *str);
 bool is_while_keyword(char *str);
+bool is_for_keyword(char *str);
 
 // 新しいトークンを作成してcurに繋げる
 Token *new_token(TokenKind kind, Token *cur, char *str, TokenizedStr *ts, int len)
@@ -88,6 +89,13 @@ TokenizedStr *tokenize(char *p)
             continue;
         }
 
+        if (is_for_keyword(p))
+        {
+            cur = new_token(TK_FOR, cur, p, ts, 3);
+            p += 3;
+            continue;
+        }
+
         if (is_ident_char(*p))
         {
             char *start = p;
@@ -152,6 +160,11 @@ bool is_while_keyword(char *str)
     return strncmp(str, "while", 5) == 0 && !is_alnum(str[5]);
 }
 
+bool is_for_keyword(char *str)
+{
+    return strncmp(str, "for", 3) == 0 && !is_alnum(str[3]);
+}
+
 bool is_ident_char(char c)
 {
     return 'a' <= c && c <= 'z';
@@ -175,6 +188,12 @@ bool consume(char *op, Token **token)
     }
 
     if (strcmp(op, "while") == 0 && (*token)->kind == TK_WHILE)
+    {
+        *token = (*token)->next;
+        return true;
+    }
+
+    if (strcmp(op, "for") == 0 && (*token)->kind == TK_FOR)
     {
         *token = (*token)->next;
         return true;
@@ -228,6 +247,18 @@ Token *consume_else(Token **token)
 Token *consume_while(Token **token)
 {
     if ((*token)->kind != TK_WHILE)
+    {
+        return false;
+    }
+
+    Token *tok = *token;
+    *token = (*token)->next;
+    return tok;
+}
+
+Token *consume_for(Token **token)
+{
+    if ((*token)->kind != TK_FOR)
     {
         return false;
     }

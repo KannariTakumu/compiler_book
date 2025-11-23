@@ -95,6 +95,38 @@ Node *stmt(Token **token)
     node->rhs = stmt(token);
     return node; // while文の場合は追加のセミコロンを期待しない
   }
+  else if (consume("for", token))
+  {
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_FOR;
+    expect("(", token);
+
+    if (!consume(";", token))
+    {
+      node->for_init = expr(token);
+      expect(";", token);
+    }
+
+    if (!consume(";", token))
+    {
+      node->for_cond = expr(token);
+      expect(";", token);
+    }
+    else
+    {
+      // 条件式が省略された場合は常に真とする
+      node->for_cond = new_node_num(1);
+    }
+
+    if (!consume(")", token))
+    {
+      node->for_update = expr(token);
+      expect(")", token);
+    }
+
+    node->for_body = stmt(token);
+    return node; // for文の場合は追加のセミコロンを期待しない
+  }
   else
   {
     node = expr(token);

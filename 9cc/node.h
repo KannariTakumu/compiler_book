@@ -20,6 +20,7 @@ typedef enum
   ND_IF,     // if文
   ND_ELSE,   // else文
   ND_WHILE,  // while文
+  ND_FOR,    // for文
 } NodeKind;
 
 typedef struct Node Node;
@@ -32,6 +33,12 @@ struct Node
   Node *rhs;     // 右辺
   int val;       // kindがND_NUMの場合のみ使う
   int offset;    // kindがND_LVARの場合のみ使う。RBPからのオフセット
+
+  // for文用のメンバー
+  Node *for_init;   // for文の初期化文 (A)
+  Node *for_cond;   // for文の条件式 (B)
+  Node *for_update; // for文の更新文 (C)
+  Node *for_body;   // for文の本体 (D)
 };
 
 // ノード生成関数
