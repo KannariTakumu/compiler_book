@@ -1,0 +1,118 @@
+# デバッグ用アセンブリ出力手順
+
+## 基本的な使用方法
+
+### 1. アセンブリファイルの生成
+```bash
+./9cc 'コード' > debug.s
+```
+
+### 2. デバッグメッセージを除外してアセンブリのみ出力
+```bash
+./9cc 'コード' > debug.s 2>/dev/null
+```
+
+### 3. アセンブリファイルの内容確認
+```bash
+cat debug.s
+```
+
+### 4. アセンブリのコンパイルと実行
+```bash
+cc -o debug debug.s
+./debug
+echo "Exit code: $?"
+```
+
+## 具体例
+
+### 例1: 単純な式
+```bash
+# コード生成
+./9cc '1 + 2;' > debug.s 2>/dev/null
+
+# 確認
+cat debug.s
+
+# 実行
+cc -o debug debug.s && ./debug; echo "Exit code: $?"
+```
+
+### 例2: if文のテスト
+```bash
+# 条件が真の場合
+./9cc 'a = 2; if (1 == 1) a = 3; return a;' > debug.s 2>/dev/null
+
+# 条件が偽の場合  
+./9cc 'a = 2; if (1 == 2) a = 3; return a;' > debug.s 2>/dev/null
+```
+
+### 例3: 変数操作
+```bash
+./9cc 'x = 5; y = x * 2; return y;' > debug.s 2>/dev/null
+```
+
+### 例4: 複雑な式
+```bash
+./9cc 'a = 3; b = 5; if (a < b) return a + b; return a - b;' > debug.s 2>/dev/null
+```
+
+## ワンライナーでのテスト
+
+### アセンブリ生成から実行まで
+```bash
+./9cc 'コード' > debug.s 2>/dev/null && cc -o debug debug.s && ./debug; echo "Exit code: $?"
+```
+
+### 複数のテストを連続実行
+```bash
+for code in 'return 42;' 'a=5; return a;' 'if(1) return 1; return 0;'; do
+  echo "Testing: $code"
+  ./9cc "$code" > debug.s 2>/dev/null && cc -o debug debug.s && ./debug; echo "Exit code: $?"
+  echo "---"
+done
+```
+
+## ファイルの整理
+
+### 生成されたファイルの削除
+```bash
+rm -f debug.s debug tmp.s tmp
+```
+
+### 自動クリーンアップ付きテスト
+```bash
+test_code() {
+  local code="$1"
+  echo "Testing: $code"
+  ./9cc "$code" > debug.s 2>/dev/null && cc -o debug debug.s && ./debug
+  echo "Exit code: $?"
+  rm -f debug.s debug
+}
+
+# 使用例
+test_code 'return 42;'
+test_code 'a = 5; return a;'
+```
+
+## トラブルシューティング
+
+### よくあるエラー
+
+1. **コンパイルエラー**: 生成されたアセンブリに構文エラー
+   - `cat debug.s` でアセンブリを確認
+   - 余分な文字や不正な命令がないかチェック
+
+2. **実行時エラー**: セグメンテーションフォルト
+   - スタック操作のバランスをチェック
+   - 変数のオフセット計算を確認
+
+3. **期待と異なる結果**: 
+   - アセンブリの条件分岐部分を確認
+   - ラベルのジャンプ先が正しいかチェック
+
+### デバッグのヒント
+
+- stderr出力（`2>/dev/null`）を削除してデバッグメッセージを表示
+- `gdb`を使用した詳細デバッグ: `gdb ./debug`
+- アセンブリの特定部分にコメントを追加して動作確認
