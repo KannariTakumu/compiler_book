@@ -19,6 +19,7 @@ typedef enum
   ND_RETURN, // return文
   ND_IF,     // if文
   ND_ELSE,   // else文
+  ND_WHILE,  // while文
 } NodeKind;
 
 typedef struct Node Node;

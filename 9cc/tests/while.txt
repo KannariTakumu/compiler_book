@@ -1,0 +1,10 @@
+# while文のテストケース
+
+# 基本的なwhile文
+2 a = 0; while(a < 2) a = a + 1; return a;
+
+# ループしない
+5 a = 5; while(a < 2) a = a + 1; return a;
+
+# while文の後にさらに処理
+7 a = 0; while(a < 3) a = a + 1; a = a + 4; return a;

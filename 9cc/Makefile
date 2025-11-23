@@ -32,6 +32,9 @@ test-return: 9cc
 test-if: 9cc
 	./test.sh if.txt
 
+test-while: 9cc
+	./test.sh while.txt
+
 test-integration: 9cc
 	./test.sh integration.txt
 

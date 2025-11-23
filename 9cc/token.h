@@ -12,6 +12,7 @@ typedef enum
     TK_RETURN,   // returnキーワード
     TK_IF,       // ifキーワード
     TK_ELSE,     // elseキーワード
+    TK_WHILE,    // whileキーワード
     TK_EOF,      // 入力の終わりを表すトークン
 } TokenKind;
 

@@ -14,6 +14,7 @@ bool is_return_keyword(char *str);
 bool is_expected_reserved_token(char *op, Token *token);
 bool is_if_keyword(char *str);
 bool is_else_keyword(char *str);
+bool is_while_keyword(char *str);
 
 // 新しいトークンを作成してcurに繋げる
 Token *new_token(TokenKind kind, Token *cur, char *str, TokenizedStr *ts, int len)
@@ -80,6 +81,13 @@ TokenizedStr *tokenize(char *p)
             continue;
         }
 
+        if (is_while_keyword(p))
+        {
+            cur = new_token(TK_WHILE, cur, p, ts, 5);
+            p += 5;
+            continue;
+        }
+
         if (is_ident_char(*p))
         {
             char *start = p;
@@ -139,6 +147,11 @@ bool is_else_keyword(char *str)
     return strncmp(str, "else", 4) == 0 && !is_alnum(str[4]);
 }
 
+bool is_while_keyword(char *str)
+{
+    return strncmp(str, "while", 5) == 0 && !is_alnum(str[5]);
+}
+
 bool is_ident_char(char c)
 {
     return 'a' <= c && c <= 'z';
@@ -148,6 +161,25 @@ bool is_ident_char(char c)
 // 真を返す。それ以外の場合には偽を返す。
 bool consume(char *op, Token **token)
 {
+    // キーワードのチェック
+    if (strcmp(op, "if") == 0 && (*token)->kind == TK_IF)
+    {
+        *token = (*token)->next;
+        return true;
+    }
+
+    if (strcmp(op, "else") == 0 && (*token)->kind == TK_ELSE)
+    {
+        *token = (*token)->next;
+        return true;
+    }
+
+    if (strcmp(op, "while") == 0 && (*token)->kind == TK_WHILE)
+    {
+        *token = (*token)->next;
+        return true;
+    }
+
     if (!is_expected_reserved_token(op, *token))
     {
         return false;
@@ -184,6 +216,18 @@ Token *consume_if(Token **token)
 Token *consume_else(Token **token)
 {
     if ((*token)->kind != TK_ELSE)
+    {
+        return false;
+    }
+
+    Token *tok = *token;
+    *token = (*token)->next;
+    return tok;
+}
+
+Token *consume_while(Token **token)
+{
+    if ((*token)->kind != TK_WHILE)
     {
         return false;
     }

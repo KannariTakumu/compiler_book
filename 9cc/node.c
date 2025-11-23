@@ -85,6 +85,16 @@ Node *stmt(Token **token)
     }
     return node; // if文の場合は追加のセミコロンを期待しない
   }
+  else if (consume("while", token))
+  {
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_WHILE;
+    expect("(", token);
+    node->lhs = expr(token);
+    expect(")", token);
+    node->rhs = stmt(token);
+    return node; // while文の場合は追加のセミコロンを期待しない
+  }
   else
   {
     node = expr(token);

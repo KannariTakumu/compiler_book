@@ -55,6 +55,20 @@ void gen(Node *node)
     return;
   }
 
+  if (node->kind == ND_WHILE)
+  {
+    int current_label = labelseq++;
+    printf(".Lbegin%d:\n", current_label);
+    gen(node->lhs); // 条件式の生成
+    printf("  pop rax\n");
+    printf("  cmp rax, 0\n");
+    printf("  je .Lend%d\n", current_label);
+    gen(node->rhs);
+    printf("  jmp .Lbegin%d\n", current_label);
+    printf(".Lend%d:\n", current_label);
+    return;
+  }
+
   switch (node->kind)
   {
   case ND_NUM:
