@@ -35,17 +35,6 @@ test-if: 9cc
 test-integration: 9cc
 	./test.sh integration.txt
 
-# ヘルプ表示
-help:
-	@echo "Available test targets:"
-	@echo "  test            - Run all test cases"
-	@echo "  test-arithmetic - Run basic arithmetic tests"
-	@echo "  test-comparison - Run comparison operator tests"
-	@echo "  test-variables  - Run variable and assignment tests"
-	@echo "  test-return     - Run return statement tests"
-	@echo "  test-if         - Run if statement tests"
-	@echo "  test-integration- Run integration tests"
-
 # 掃除
 clean:
 	rm -f 9cc *.o *~ tmp*
