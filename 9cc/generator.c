@@ -3,6 +3,8 @@
 #include "node.h"
 #include "error.h"
 
+int labelseq = 0;
+
 void gen_lval(Node *node)
 {
   if (node->kind != ND_LVAR)
@@ -22,6 +24,34 @@ void gen(Node *node)
     printf("  mov rsp, rbp\n");
     printf("  pop rbp\n");
     printf("  ret\n");
+    return;
+  }
+
+  if (node->kind == ND_IF)
+  {
+    int current_label = labelseq++;
+    gen(node->lhs); // 条件式の生成
+    printf("  pop rax\n");
+    printf("  cmp rax, 0\n");
+
+    // elseがあるかチェック
+    if (node->rhs && node->rhs->kind == ND_ELSE)
+    {
+      // if-else文の場合
+      printf("  je .Lelse%d\n", current_label);
+      gen(node->rhs->lhs);
+      printf("  jmp .Lend%d\n", current_label);
+      printf(".Lelse%d:\n", current_label);
+      gen(node->rhs->rhs);
+      printf(".Lend%d:\n", current_label);
+    }
+    else
+    {
+      // elseのないif文の場合
+      printf("  je .Lend%d\n", current_label);
+      gen(node->rhs);
+      printf(".Lend%d:\n", current_label);
+    }
     return;
   }
 

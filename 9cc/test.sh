@@ -9,6 +9,7 @@ TEST_FILES=(
   "comparison.txt"
   "variables.txt"
   "return.txt"
+  "if.txt"
   "integration.txt"
 )
 

@@ -29,6 +29,9 @@ test-variables: 9cc
 test-return: 9cc
 	./test.sh return.txt
 
+test-if: 9cc
+	./test.sh if.txt
+
 test-integration: 9cc
 	./test.sh integration.txt
 
@@ -40,10 +43,11 @@ help:
 	@echo "  test-comparison - Run comparison operator tests"
 	@echo "  test-variables  - Run variable and assignment tests"
 	@echo "  test-return     - Run return statement tests"
+	@echo "  test-if         - Run if statement tests"
 	@echo "  test-integration- Run integration tests"
 
 # 掃除
 clean:
 	rm -f 9cc *.o *~ tmp*
 
-.PHONY: test test-arithmetic test-comparison test-variables test-return test-integration help clean
+.PHONY: test test-arithmetic test-comparison test-variables test-return test-if test-integration help clean

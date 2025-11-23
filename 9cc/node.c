@@ -59,14 +59,6 @@ Node *expr(Token **token)
   return assign(token);
 }
 
-Node *assign(Token **token)
-{
-  Node *node = equality(token);
-  if (consume("=", token))
-    node = new_node(ND_ASSIGN, node, assign(token));
-  return node;
-}
-
 Node *stmt(Token **token)
 {
 
@@ -74,6 +66,24 @@ Node *stmt(Token **token)
   if (consume_return(token))
   {
     node = new_node_return(token);
+  }
+  else if (consume("if", token))
+  {
+    node = calloc(1, sizeof(Node));
+    node->kind = ND_IF;
+    expect("(", token);
+    node->lhs = expr(token);
+    expect(")", token);
+    node->rhs = stmt(token);
+    if (consume("else", token))
+    {
+      Node *else_node = calloc(1, sizeof(Node));
+      else_node->kind = ND_ELSE;
+      else_node->lhs = node->rhs;
+      else_node->rhs = stmt(token);
+      node->rhs = else_node;
+    }
+    return node; // if文の場合は追加のセミコロンを期待しない
   }
   else
   {
@@ -84,6 +94,14 @@ Node *stmt(Token **token)
   {
     error_at((*token)->str, (*token)->owner->value, "';'ではありません");
   }
+  return node;
+}
+
+Node *assign(Token **token)
+{
+  Node *node = equality(token);
+  if (consume("=", token))
+    node = new_node(ND_ASSIGN, node, assign(token));
   return node;
 }
 

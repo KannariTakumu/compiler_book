@@ -17,6 +17,8 @@ typedef enum
   ND_LVAR,   // ローカル変数
   ND_NUM,    // 整数
   ND_RETURN, // return文
+  ND_IF,     // if文
+  ND_ELSE,   // else文
 } NodeKind;
 
 typedef struct Node Node;

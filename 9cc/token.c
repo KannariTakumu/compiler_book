@@ -12,6 +12,8 @@ bool is_reserved_str(char *str);
 bool is_ident_char(char c);
 bool is_return_keyword(char *str);
 bool is_expected_reserved_token(char *op, Token *token);
+bool is_if_keyword(char *str);
+bool is_else_keyword(char *str);
 
 // 新しいトークンを作成してcurに繋げる
 Token *new_token(TokenKind kind, Token *cur, char *str, TokenizedStr *ts, int len)
@@ -64,6 +66,20 @@ TokenizedStr *tokenize(char *p)
             continue;
         }
 
+        if (is_if_keyword(p))
+        {
+            cur = new_token(TK_IF, cur, p, ts, 2);
+            p += 2;
+            continue;
+        }
+
+        if (is_else_keyword(p))
+        {
+            cur = new_token(TK_ELSE, cur, p, ts, 4);
+            p += 4;
+            continue;
+        }
+
         if (is_ident_char(*p))
         {
             char *start = p;
@@ -113,6 +129,16 @@ bool is_return_keyword(char *str)
     return strncmp(str, "return", 6) == 0 && !is_alnum(str[6]);
 }
 
+bool is_if_keyword(char *str)
+{
+    return strncmp(str, "if", 2) == 0 && !is_alnum(str[2]);
+}
+
+bool is_else_keyword(char *str)
+{
+    return strncmp(str, "else", 4) == 0 && !is_alnum(str[4]);
+}
+
 bool is_ident_char(char c)
 {
     return 'a' <= c && c <= 'z';
@@ -134,6 +160,30 @@ bool consume(char *op, Token **token)
 Token *consume_return(Token **token)
 {
     if ((*token)->kind != TK_RETURN)
+    {
+        return false;
+    }
+
+    Token *tok = *token;
+    *token = (*token)->next;
+    return tok;
+}
+
+Token *consume_if(Token **token)
+{
+    if ((*token)->kind != TK_IF)
+    {
+        return false;
+    }
+
+    Token *tok = *token;
+    *token = (*token)->next;
+    return tok;
+}
+
+Token *consume_else(Token **token)
+{
+    if ((*token)->kind != TK_ELSE)
     {
         return false;
     }
