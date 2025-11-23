@@ -1,0 +1,10 @@
+# ブロックのテスト
+
+1 if (1) { return 1; }
+2 if (0) { return 1; } else { return 2; }
+3 { a = 3; return a; }
+5 { a = 2; a = a + 3; return a; }
+7 { a = 3; b = 4; return a + b; }
+10 { a = 5; if (a > 3) { return a + 5; } return a; }
+8 if (1) { a = 3; b = 5; return a + b; } else { return 0; }
+12 if (1) { a = 3; b = 5; a = a + b; } else { return 0; } for (c = 0; c < 4; c = c + 1) {a = a + 1;} return a;

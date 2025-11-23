@@ -127,6 +127,30 @@ Node *stmt(Token **token)
     node->for_body = stmt(token);
     return node; // for文の場合は追加のセミコロンを期待しない
   }
+  else if (consume("{", token))
+  {
+    Node *block_node = calloc(1, sizeof(Node));
+    block_node->kind = ND_BLOCK;
+
+    // 一時的な配列（最大100文まで対応）
+    Node *stmts[100];
+    int count = 0;
+
+    while (!consume("}", token))
+    {
+      stmts[count++] = stmt(token);
+    }
+
+    // 実際のサイズの配列を確保してコピー
+    block_node->stmts = calloc(count, sizeof(Node *));
+    block_node->stmt_count = count;
+    for (int i = 0; i < count; i++)
+    {
+      block_node->stmts[i] = stmts[i];
+    }
+
+    return block_node;
+  }
   else
   {
     node = expr(token);

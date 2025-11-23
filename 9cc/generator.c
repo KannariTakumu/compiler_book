@@ -105,6 +105,20 @@ void gen(Node *node)
     return;
   }
 
+  if (node->kind == ND_BLOCK)
+  {
+    for (int i = 0; i < node->stmt_count; i++)
+    {
+      gen(node->stmts[i]);
+      // return文以外の文の場合はスタックから結果を取り除く
+      if (node->stmts[i]->kind != ND_RETURN)
+      {
+        printf("  pop rax\n");
+      }
+    }
+    return;
+  }
+
   switch (node->kind)
   {
   case ND_NUM:

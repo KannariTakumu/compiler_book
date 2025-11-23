@@ -21,6 +21,7 @@ typedef enum
   ND_ELSE,   // else文
   ND_WHILE,  // while文
   ND_FOR,    // for文
+  ND_BLOCK,  // ブロック
 } NodeKind;
 
 typedef struct Node Node;
@@ -39,6 +40,10 @@ struct Node
   Node *for_cond;   // for文の条件式 (B)
   Node *for_update; // for文の更新文 (C)
   Node *for_body;   // for文の本体 (D)
+
+  // ブロック文用のメンバー
+  Node **stmts;   // ブロック内の文の配列
+  int stmt_count; // 文の数
 };
 
 // ノード生成関数
