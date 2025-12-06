@@ -22,6 +22,7 @@ typedef enum
   ND_WHILE,  // while文
   ND_FOR,    // for文
   ND_BLOCK,  // ブロック
+  ND_FUNC    // 関数
 } NodeKind;
 
 typedef struct Node Node;
@@ -44,6 +45,10 @@ struct Node
   // ブロック文用のメンバー
   Node **stmts;   // ブロック内の文の配列
   int stmt_count; // 文の数
+
+  // 関数用のメンバー
+  char *func_name; // 関数名
+  int func_name_len; // 関数名の長さ
 };
 
 // ノード生成関数

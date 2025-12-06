@@ -1,0 +1,10 @@
+# 関数のテスト
+
+## 基本的な関数呼び出し
+3 return ret3();
+3 a = ret3(); return a;
+
+## 式の中での関数呼び出し
+8 return ret3() + ret3() + 2;
+6 return ret3() * 2;
+15 a = ret3(); b = a * 5; return b;

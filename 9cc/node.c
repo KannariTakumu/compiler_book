@@ -249,6 +249,16 @@ Node *primary(Token **token)
   Token *tok = consume_ident(token);
   if (tok)
   {
+    if (consume("(", token))
+    {
+      // 関数呼び出しの場合
+      Node *node = calloc(1, sizeof(Node));
+      node->kind = ND_FUNC;
+      node->func_name = tok->str;
+      node->func_name_len = tok->len;
+      expect(")", token);
+      return node;
+    }
     return new_node_lvar(tok);
   }
 

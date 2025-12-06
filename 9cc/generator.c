@@ -120,6 +120,25 @@ void gen(Node *node)
     return;
   }
 
+  if (node->kind == ND_FUNC)
+  {
+    // 関数呼び出しプロローグ
+    printf("  mov rax, rsp\n");
+    printf("  and rax, 15\n");
+    printf("  cmp rax, 0\n");
+    printf("  je .Lcall%d\n", labelseq);
+    printf("  sub rsp, 8\n");
+    printf("  call %.*s\n", node->func_name_len, node->func_name);
+    printf("  add rsp, 8\n");
+    printf("  jmp .Lend%d\n", labelseq);
+    printf(".Lcall%d:\n", labelseq);
+    printf("  call %.*s\n", node->func_name_len, node->func_name);
+    printf(".Lend%d:\n", labelseq);
+    printf("  push rax\n");
+    labelseq++;
+    return;
+  }
+
   switch (node->kind)
   {
   case ND_NUM:

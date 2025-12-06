@@ -1,12 +1,17 @@
 CFLAGS = -std=c11 -g -static
 CC     = gcc
 
-SRCS=$(wildcard *.c)
+# test-から始まるファイルを除外
+SRCS=$(filter-out $(wildcard test-*.c), $(wildcard *.c))
 OBJS=$(SRCS:.c=.o)
 
 # 最終成果物
 9cc: $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS)
+
+# テスト用の外部関数
+test-func.o: test-func.c
+	$(CC) -c -o $@ $<
 
 # 個別コンパイル規則
 %.o: %.c
@@ -41,11 +46,14 @@ test-for: 9cc
 test-block: 9cc
 	./test.sh block.txt
 
+test-func: 9cc test-func.o
+	./test.sh func.txt
+
 test-integration: 9cc
 	./test.sh integration.txt
 
 # 掃除
 clean:
-	rm -f 9cc *.o *~ tmp*
+	rm -f 9cc *.o *~ tmp* test-*.o
 
 .PHONY: test test-arithmetic test-comparison test-variables test-return test-if test-while test-for test-block test-integration help clean

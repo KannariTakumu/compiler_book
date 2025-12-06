@@ -16,7 +16,14 @@ assert() {
   input="$2"
 
   ./9cc "$input" > tmp.s
-  cc -o tmp tmp.s
+  
+  # 関数テストの場合は外部関数とリンク
+  if [ "$CURRENT_TEST_FILE" = "func.txt" ]; then
+    cc -o tmp tmp.s test-func.o
+  else
+    cc -o tmp tmp.s
+  fi
+  
   ./tmp
   actual="$?"
 
@@ -37,6 +44,9 @@ run_test_file() {
     echo "Warning: Test file $full_path not found, skipping..."
     return
   fi
+  
+  # 現在のテストファイルを保存
+  export CURRENT_TEST_FILE="$test_file"
   
   echo "Running tests from $test_file..."
   
