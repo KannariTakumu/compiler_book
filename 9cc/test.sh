@@ -3,15 +3,13 @@
 # テストケースディレクトリ
 TEST_DIR="tests"
 
-# 実行するテストファイル一覧
-TEST_FILES=(
-  "basic_arithmetic.txt"
-  "comparison.txt"
-  "variables.txt"
-  "return.txt"
-  "if.txt"
-  "integration.txt"
-)
+# 実行するテストファイル一覧を動的に取得
+TEST_FILES=()
+if [ -d "$TEST_DIR" ]; then
+  while IFS= read -r -d '' file; do
+    TEST_FILES+=("$(basename "$file")")
+  done < <(find "$TEST_DIR" -name "*.txt" -type f -print0 | sort -z)
+fi
 
 assert() {
   expected="$1"
