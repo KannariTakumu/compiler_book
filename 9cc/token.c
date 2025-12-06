@@ -3,7 +3,6 @@
 #include <ctype.h>
 #include <string.h>
 #include "token.h"
-#include "tokenized_str.h"
 #include "error.h"
 
 // 前方宣言

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stdbool.h>
-#include "tokenized_str.h"
 
 // トークンの種類
 typedef enum
@@ -29,6 +28,12 @@ struct Token
     char *str;           // トークン文字列
     TokenizedStr *owner; // トークンが属している文字列
     int len;
+};
+
+// Tokenizeされた文字列の型
+struct TokenizedStr{
+    Token *head; // 先頭のトークンのアドレス
+    char *value; // Tokenizeされた文字列
 };
 
 Token *new_token(TokenKind kind, Token *cur, char *str, TokenizedStr *ts, int len);
