@@ -116,6 +116,7 @@ void gen(Node *node)
         printf("  pop rax\n");
       }
     }
+    printf("  push 0\n");
     return;
   }
 

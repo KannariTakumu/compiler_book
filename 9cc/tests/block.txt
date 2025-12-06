@@ -1,6 +1,7 @@
 # ブロックのテスト
 
 1 if (1) { return 1; }
+0 { a = 3; }
 2 if (0) { return 1; } else { return 2; }
 3 { a = 3; return a; }
 5 { a = 2; a = a + 3; return a; }
