@@ -122,14 +122,14 @@ void gen(Node *node)
 
   if (node->kind == ND_FUNC)
   {
-    // 関数呼び出しプロローグ
+    // x86-64のABIでは、関数呼び出し前にRSPが16バイトアラインされている必要がある
     printf("  mov rax, rsp\n");
-    printf("  and rax, 15\n");
+    printf("  and rax, 15\n"); // rspが16の倍数かチェック
     printf("  cmp rax, 0\n");
     printf("  je .Lcall%d\n", labelseq);
-    printf("  sub rsp, 8\n");
+    printf("  sub rsp, 8\n"); // アラインされていなければ調整
     printf("  call %.*s\n", node->func_name_len, node->func_name);
-    printf("  add rsp, 8\n");
+    printf("  add rsp, 8\n"); // 調整を戻す
     printf("  jmp .Lend%d\n", labelseq);
     printf(".Lcall%d:\n", labelseq);
     printf("  call %.*s\n", node->func_name_len, node->func_name);
