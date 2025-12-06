@@ -54,16 +54,11 @@ void program(Node **code, Token **token)
   code[i] = NULL;
 }
 
-Node *expr(Token **token)
-{
-  return assign(token);
-}
-
 Node *stmt(Token **token)
 {
 
   Node *node;
-  if (consume_return(token))
+  if (consume("return", token))
   {
     node = new_node_return(token);
   }
@@ -161,6 +156,11 @@ Node *stmt(Token **token)
     error_at((*token)->str, (*token)->owner->value, "';'ではありません");
   }
   return node;
+}
+
+Node *expr(Token **token)
+{
+  return assign(token);
 }
 
 Node *assign(Token **token)

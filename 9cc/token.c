@@ -175,6 +175,12 @@ bool is_ident_char(char c)
 bool consume(char *op, Token **token)
 {
     // キーワードのチェック
+    if (strcmp(op, "return") == 0 && (*token)->kind == TK_RETURN)
+    {
+        *token = (*token)->next;
+        return true;
+    }
+
     if (strcmp(op, "if") == 0 && (*token)->kind == TK_IF)
     {
         *token = (*token)->next;
@@ -206,66 +212,6 @@ bool consume(char *op, Token **token)
 
     *token = (*token)->next;
     return true;
-}
-
-Token *consume_return(Token **token)
-{
-    if ((*token)->kind != TK_RETURN)
-    {
-        return false;
-    }
-
-    Token *tok = *token;
-    *token = (*token)->next;
-    return tok;
-}
-
-Token *consume_if(Token **token)
-{
-    if ((*token)->kind != TK_IF)
-    {
-        return false;
-    }
-
-    Token *tok = *token;
-    *token = (*token)->next;
-    return tok;
-}
-
-Token *consume_else(Token **token)
-{
-    if ((*token)->kind != TK_ELSE)
-    {
-        return false;
-    }
-
-    Token *tok = *token;
-    *token = (*token)->next;
-    return tok;
-}
-
-Token *consume_while(Token **token)
-{
-    if ((*token)->kind != TK_WHILE)
-    {
-        return false;
-    }
-
-    Token *tok = *token;
-    *token = (*token)->next;
-    return tok;
-}
-
-Token *consume_for(Token **token)
-{
-    if ((*token)->kind != TK_FOR)
-    {
-        return false;
-    }
-
-    Token *tok = *token;
-    *token = (*token)->next;
-    return tok;
 }
 
 // 次のトークンが識別子のときには、トークンを1つ読み進めて
