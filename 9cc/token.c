@@ -123,7 +123,7 @@ TokenizedStr *tokenize(char *p)
 
 bool is_reserved_char(char c)
 {
-    return c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')' || c == '<' || c == '>' || c == ';' || c == '=' || c == '{' || c == '}';
+    return c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')' || c == '<' || c == '>' || c == ';' || c == '=' || c == '{' || c == '}' || c == ',';
 }
 
 bool is_reserved_str(char *str)

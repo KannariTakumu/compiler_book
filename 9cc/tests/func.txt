@@ -8,3 +8,14 @@
 8 return ret3() + ret3() + 2;
 6 return ret3() * 2;
 15 a = ret3(); b = a * 5; return b;
+
+## 引数を持つ関数呼び出し
+7 return add(3, 4);
+2 return sub(5, 3);
+8 return add(ret3(), ret5());
+10 a = 3; b = 7; return add(a, b);
+
+## 複数引数の関数
+21 return add6(1, 2, 3, 4, 5, 6);
+15 return add6(1, 2, 3, 4, 5, 0);
+6 return add6(1, 1, 1, 1, 1, 1);

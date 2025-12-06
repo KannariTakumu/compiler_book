@@ -122,16 +122,34 @@ void gen(Node *node)
 
   if (node->kind == ND_FUNC)
   {
+    // 引数レジスタ（x86-64 System V ABI）
+    char *argreg[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
+    
+    // 引数を評価してスタックに積む
+    for (int i = 0; i < node->arg_count; i++)
+    {
+      gen(node->args[i]);
+    }
+    
+    // スタックから引数をレジスタにpop（逆順）
+    for (int i = node->arg_count - 1; i >= 0; i--)
+    {
+      printf("  pop %s\n", argreg[i]);
+    }
+    
     // x86-64のABIでは、関数呼び出し前にRSPが16バイトアラインされている必要がある
+    // また、可変長引数関数の場合、raxにベクトルレジスタで渡される引数の数を設定
     printf("  mov rax, rsp\n");
     printf("  and rax, 15\n"); // rspが16の倍数かチェック
     printf("  cmp rax, 0\n");
     printf("  je .Lcall%d\n", labelseq);
     printf("  sub rsp, 8\n"); // アラインされていなければ調整
+    printf("  mov rax, 0\n"); // ベクトルレジスタ引数の数（今は0）
     printf("  call %.*s\n", node->func_name_len, node->func_name);
     printf("  add rsp, 8\n"); // 調整を戻す
     printf("  jmp .Lend%d\n", labelseq);
     printf(".Lcall%d:\n", labelseq);
+    printf("  mov rax, 0\n"); // ベクトルレジスタ引数の数（今は0）
     printf("  call %.*s\n", node->func_name_len, node->func_name);
     printf(".Lend%d:\n", labelseq);
     printf("  push rax\n");

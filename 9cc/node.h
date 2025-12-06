@@ -49,6 +49,8 @@ struct Node
   // 関数用のメンバー
   char *func_name; // 関数名
   int func_name_len; // 関数名の長さ
+  Node **args;     // 引数のリスト
+  int arg_count;   // 引数の数
 };
 
 // ノード生成関数

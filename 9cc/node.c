@@ -249,14 +249,28 @@ Node *primary(Token **token)
   Token *tok = consume_ident(token);
   if (tok)
   {
+    // 「(」が続くなら関数呼び出し
     if (consume("(", token))
     {
-      // 関数呼び出しの場合
       Node *node = calloc(1, sizeof(Node));
       node->kind = ND_FUNC;
       node->func_name = tok->str;
       node->func_name_len = tok->len;
-      expect(")", token);
+      
+      // 引数リストの初期化
+      node->args = calloc(6, sizeof(Node*));  // 最大6引数
+      node->arg_count = 0;
+
+      // 引数がある場合
+      if (!consume(")", token))
+      {
+        node->args[node->arg_count++] = assign(token);
+        while (consume(",", token))
+        {
+          node->args[node->arg_count++] = assign(token);
+        }
+        expect(")", token);
+      }
       return node;
     }
     return new_node_lvar(tok);

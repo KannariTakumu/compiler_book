@@ -18,7 +18,7 @@ assert() {
   ./9cc "$input" > tmp.s
   
   # 関数テストの場合は外部関数とリンク
-  if [ "$CURRENT_TEST_FILE" = "func.txt" ]; then
+  if [ "$CURRENT_TEST_FILE" = "func.txt" ] || [ "$CURRENT_TEST_FILE" = "integration.txt" ]; then
     cc -o tmp tmp.s test-func.o
   else
     cc -o tmp tmp.s

@@ -49,7 +49,7 @@ test-block: 9cc
 test-func: 9cc test-func.o
 	./test.sh func.txt
 
-test-integration: 9cc
+test-integration: 9cc test-func.o
 	./test.sh integration.txt
 
 # 掃除
